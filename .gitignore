@@ -1,7 +1,6 @@
 # Data directories
 raw_data/
 patients/
-test_patients/
 data/raw/
 data/processed/
 
