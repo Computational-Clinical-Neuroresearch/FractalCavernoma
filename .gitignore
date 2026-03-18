@@ -1,0 +1,39 @@
+# Data directories
+raw_data/
+patients/
+test_patients/
+data/raw/
+data/processed/
+
+# Temporary and log files
+*.log
+logs/*.log
+*.tmp
+*.swp
+*~
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Docker
+.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.code-workspace

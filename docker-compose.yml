@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  fractal-cavernoma:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: fractal-cavernoma:latest
+    container_name: fractal-cavernoma-pipeline
+    runtime: nvidia
+
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=0,1
+      - CUDA_VISIBLE_DEVICES=0,1
+      - DISPLAY=${DISPLAY}
+
+    volumes:
+      - ./:/workspace
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+
+    ports:
+      - "5901:5901"
+
+    stdin_open: true
+    tty: true
+
+    deploy:
+      resources:
+        limits:
+          cpus: '16'
+          memory: 32G
+        reservations:
+          cpus: '8'
+          memory: 16G
+          devices:
+            - driver: nvidia
+              device_ids: ['0', '1']
+              capabilities: [gpu]

@@ -1,0 +1,35 @@
+# Ignore large data directories to speed up Docker build
+raw_data/
+patients/
+test_patients/
+
+# Ignore output files
+*.nii
+*.nii.gz
+*.mat
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+*.md
+!README_PIPELINE.md
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
