@@ -105,7 +105,16 @@ antsRegistration \
 echo "T1 Step 3: Skull stripping (HD-BET)"
 T1_STEP3="$OUT_DIR_PART2/${SUBJECT_ID}_T1_Step3_SkullStrip.nii.gz"
 T1_HDBET_TMP="$OUT_DIR_PART2/${SUBJECT_ID}_T1_Step3_tmp.nii.gz"
-hd-bet -i "$T1_STEP2" -o "$T1_HDBET_TMP" -device cpu --disable_tta
+
+# Use GPU if available, fallback to CPU
+if command -v nvidia-smi >/dev/null 2>&1 && nvidia-smi >/dev/null 2>&1; then
+    echo "  Using GPU for HD-BET"
+    hd-bet -i "$T1_STEP2" -o "$T1_HDBET_TMP" -device cuda --disable_tta
+else
+    echo "  GPU not available, using CPU for HD-BET"
+    hd-bet -i "$T1_STEP2" -o "$T1_HDBET_TMP" -device cpu --disable_tta
+fi
+
 mv "$T1_HDBET_TMP" "$T1_STEP3"
 echo "T1 skull stripped image saved to: $T1_STEP3"
 
