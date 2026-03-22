@@ -4,6 +4,10 @@ patients/
 data/raw/
 data/processed/
 
+# Pipeline outputs
+**/Output_Part1/
+**/Output_Part2/
+
 # Temporary and log files
 *.log
 logs/*.log
