@@ -42,9 +42,9 @@ run_part1() {
     # Export GPU for this process
     export CUDA_VISIBLE_DEVICES=${gpu_id}
 
-    # Run preprocessing
-    cd "$ROOT/scripts"
-    ./mri_preprocess_part1.sh "${subject}" "${patients_dir}" 2>&1 | \
+    # Run preprocessing (scripts expect to be run from workspace root)
+    cd "$ROOT"
+    ./scripts/mri_preprocess_part1.sh "${subject}" "${patients_dir}" 2>&1 | \
         sed "s/^/[GPU ${gpu_id}] [${subject}] /"
 
     echo "[GPU ${gpu_id}] Completed Part 1 for ${subject}"
@@ -61,9 +61,9 @@ run_part2() {
     # Export GPU for this process
     export CUDA_VISIBLE_DEVICES=${gpu_id}
 
-    # Run preprocessing
-    cd "$ROOT/scripts"
-    ./mri_preprocess_part2.sh "${subject}" "${patients_dir}" 2>&1 | \
+    # Run preprocessing (scripts expect to be run from workspace root)
+    cd "$ROOT"
+    ./scripts/mri_preprocess_part2.sh "${subject}" "${patients_dir}" 2>&1 | \
         sed "s/^/[GPU ${gpu_id}] [${subject}] /"
 
     echo "[GPU ${gpu_id}] Completed Part 2 for ${subject}"
@@ -80,8 +80,8 @@ if [ "$PART" = "part1" ] || [ "$PART" = "both" ]; then
     echo ""
 
     # Run 4 subjects in parallel (Part 1 doesn't use GPU heavily)
-    parallel -j 4 --bar --joblog "${PATIENTS_DIR}_part1.log" \
-        'run_part1 {} $(( {%} % 2 )) '"${PATIENTS_DIR}" ::: "${SUBJECTS[@]}"
+    parallel -j 4 --bar --no-notice --joblog "${PATIENTS_DIR}_part1.log" \
+        'run_part1 {} $(( {%} % 2 )) '"${PATIENTS_DIR}" ::: "${SUBJECTS[@]}" 2>&1 | grep -v "cannot open /dev/tty"
 
     echo ""
     echo "Part 1 complete!"
@@ -126,8 +126,8 @@ if [ "$PART" = "part2" ] || [ "$PART" = "both" ]; then
     fi
 
     # Run 2 subjects in parallel (one per GPU for GPU-intensive HD-BET)
-    parallel -j 2 --bar --joblog "${PATIENTS_DIR}_part2.log" \
-        'run_part2 {} $(( {%} % 2 )) '"${PATIENTS_DIR}" ::: "${SUBJECTS[@]}"
+    parallel -j 2 --bar --no-notice --joblog "${PATIENTS_DIR}_part2.log" \
+        'run_part2 {} $(( {%} % 2 )) '"${PATIENTS_DIR}" ::: "${SUBJECTS[@]}" 2>&1 | grep -v "cannot open /dev/tty"
 
     echo ""
     echo "Part 2 complete!"

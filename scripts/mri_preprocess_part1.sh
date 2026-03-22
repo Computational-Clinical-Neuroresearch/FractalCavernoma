@@ -2,27 +2,28 @@
 set -euo pipefail
 
 # ---------------------------------------------------------------------------
-# USAGE: ./mri_preprocess_part1_MM.sh <subject_id>
-# EXAMPLE: ./mri_preprocess_part1_MM.sh sub-001
-# BATCH:   for subject in patients/sub-*/; do ./mri_preprocess_part1_MM.sh "$(basename "$subject")"; done
+# USAGE: ./mri_preprocess_part1.sh <subject_id> [patients_dir]
+# EXAMPLE: ./mri_preprocess_part1.sh sub-001 patients
+# BATCH:   for subject in patients/sub-*/; do ./mri_preprocess_part1.sh "$(basename "$subject")" patients; done
 # ---------------------------------------------------------------------------
 
 # Check that a subject ID argument was provided
 if [ $# -eq 0 ]; then
     echo "ERROR: No subject ID provided."
-    echo "USAGE: ./mri_preprocess_part1_MM.sh <subject_id>"
-    echo "EXAMPLE: ./mri_preprocess_part1_MM.sh sub-001"
+    echo "USAGE: ./mri_preprocess_part1.sh <subject_id> [patients_dir]"
+    echo "EXAMPLE: ./mri_preprocess_part1.sh sub-001 patients"
     exit 1
 fi
 
 SUBJECT_ID="$1"
+PATIENTS_DIR="${2:-patients}"  # Default to 'patients' if not provided
 
-# Always operate relative to the folder where this script lives (study root)
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Always operate relative to workspace root
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
 # Paths based on subject ID
-SUBJECT_DIR="patients/${SUBJECT_ID}"
+SUBJECT_DIR="${PATIENTS_DIR}/${SUBJECT_ID}"
 OUT_DIR="${SUBJECT_DIR}/Output_Part1"
 
 # Check that the subject folder exists

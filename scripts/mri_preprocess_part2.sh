@@ -2,27 +2,28 @@
 set -euo pipefail
 
 # ---------------------------------------------------------------------------
-# USAGE: ./mri_preprocess_part2.sh <subject_id>
-# EXAMPLE: ./mri_preprocess_part2.sh sub-001
-# BATCH:   for subject in patients/sub-*/; do ./mri_preprocess_part2.sh "$(basename "$subject")"; done
+# USAGE: ./mri_preprocess_part2.sh <subject_id> [patients_dir]
+# EXAMPLE: ./mri_preprocess_part2.sh sub-001 patients
+# BATCH:   for subject in patients/sub-*/; do ./mri_preprocess_part2.sh "$(basename "$subject")" patients; done
 # ---------------------------------------------------------------------------
 
 # Check that a subject ID argument was provided
 if [ $# -eq 0 ]; then
     echo "ERROR: No subject ID provided."
-    echo "USAGE: ./mri_preprocess_part2.sh <subject_id>"
-    echo "EXAMPLE: ./mri_preprocess_part2.sh sub-001"
+    echo "USAGE: ./mri_preprocess_part2.sh <subject_id> [patients_dir]"
+    echo "EXAMPLE: ./mri_preprocess_part2.sh sub-001 patients"
     exit 1
 fi
 
 SUBJECT_ID="$1"
+PATIENTS_DIR="${2:-patients}"  # Default to 'patients' if not provided
 
-# Always operate relative to the folder where this script lives (study root)
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Always operate relative to workspace root
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
 # Paths based on subject ID
-SUBJECT_DIR="patients/${SUBJECT_ID}"
+SUBJECT_DIR="${PATIENTS_DIR}/${SUBJECT_ID}"
 OUT_DIR_PART1="${SUBJECT_DIR}/Output_Part1"
 OUT_DIR_PART2="${SUBJECT_DIR}/Output_Part2"
 MNI_REF="${FSLDIR}/data/standard/MNI152_T1_1mm.nii.gz"
@@ -146,7 +147,7 @@ echo "Lesion mask warped to MNI space: $LESION_MASK_MNI"
 
 T1_STEP4="$OUT_DIR_PART2/${SUBJECT_ID}_T1_Step4_ZScore.nii.gz"
 T1_NORM_MASK="$OUT_DIR_PART2/${SUBJECT_ID}_T1_normalisation_mask.nii.gz"
-python3 "$ROOT/zscore_normalise.py" "$T1_STEP3" "$T1_STEP4" "$LESION_MASK_MNI" "$T1_NORM_MASK"
+python3 "$ROOT/scripts/zscore_normalise.py" "$T1_STEP3" "$T1_STEP4" "$LESION_MASK_MNI" "$T1_NORM_MASK"
 echo ""
 
 # ---------------------------------------------------------------------------
@@ -212,7 +213,7 @@ EOF
 echo "FLAIR Step 4: Z-score intensity normalisation (lesion excluded from mean and std calculation)"
 FLAIR_STEP4="$OUT_DIR_PART2/${SUBJECT_ID}_FLAIR_Step4_ZScore.nii.gz"
 FLAIR_NORM_MASK="$OUT_DIR_PART2/${SUBJECT_ID}_FLAIR_normalisation_mask.nii.gz"
-python3 "$ROOT/zscore_normalise.py" "$FLAIR_STEP3" "$FLAIR_STEP4" "$LESION_MASK_MNI" "$FLAIR_NORM_MASK"
+python3 "$ROOT/scripts/zscore_normalise.py" "$FLAIR_STEP3" "$FLAIR_STEP4" "$LESION_MASK_MNI" "$FLAIR_NORM_MASK"
 
 echo ""
 echo "PART 2 DONE for ${SUBJECT_ID}. Outputs written to: $OUT_DIR_PART2"
